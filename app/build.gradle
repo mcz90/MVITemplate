@@ -1,0 +1,38 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: "androidx.navigation.safeargs.kotlin"
+apply plugin: 'kotlin-kapt'
+apply plugin: 'kotlinx-serialization'
+apply from: 'dependencies.gradle'
+apply from: "${rootDir}/config/quality/quality.gradle"
+
+android {
+    defaultConfig {
+        applicationId "com.czyzewski.mvitemplate"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunnerArguments clearPackageData: 'true'
+    }
+
+    buildTypes {
+        debug {
+            debuggable = true
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        release {
+            minifyEnabled true
+            debuggable = true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    testOptions {
+        unitTests {
+            returnDefaultValues = true
+            all {
+                maxParallelForks = Runtime.runtime.availableProcessors()
+            }
+            animationsDisabled = true
+        }
+    }
+}

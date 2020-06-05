@@ -1,0 +1,4 @@
+rootProject.name='MVI Template'
+include ':app'
+include ':data'
+include ':mvi'

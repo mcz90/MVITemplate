@@ -1,0 +1,48 @@
+ext.prepareBuildNumber = { ->
+    project.hasProperty('versionNumber') ? versionNumber.toInteger() : 1
+}
+
+ext.prepareVersionName = { ->
+    AndroidConfig.version + "." + prepareBuildNumber()
+}
+
+ext.prepareVersionCode = { ->
+    prepareBuildNumber()
+}
+
+ext.addQuotes = {
+    text -> return "\"" + text + "\""
+}
+
+
+subprojects {
+    afterEvaluate { project ->
+        if (project.hasProperty('android')) {
+            androidExtensions {
+                experimental = true
+            }
+            android {
+                compileSdkVersion 29
+                defaultConfig {
+                    minSdkVersion 21
+                    targetSdkVersion 29
+                    versionCode 1
+                    versionName "1.0"
+
+                    testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+                }
+                androidExtensions {
+                    experimental = true
+                }
+                compileOptions {
+                    targetCompatibility JavaVersion.VERSION_1_8
+                    sourceCompatibility JavaVersion.VERSION_1_8
+                }
+
+                kotlinOptions {
+                    jvmTarget = JavaVersion.VERSION_1_8
+                }
+            }
+        }
+    }
+}
