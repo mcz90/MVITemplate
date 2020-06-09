@@ -3,9 +3,7 @@ package com.czyzewski.mvi.statereplayview
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.view.MotionEvent.ACTION_CANCEL
-import android.view.MotionEvent.ACTION_MOVE
-import android.view.MotionEvent.ACTION_UP
+import android.view.MotionEvent.*
 import android.widget.FrameLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
@@ -55,7 +53,10 @@ class StateReplayView @JvmOverloads constructor(
             setOnClickListener {
                 if (wasMoved || !stateRecorder.getConfig().isInReplayMode) return@setOnClickListener
                 onClick?.invoke()
-                adapter.apply {
+                adapter
+                    .takeIf { stateRecorder.getLast() != null }
+                    ?.apply {
+                        addStates(listOf(stateRecorder.getLast()!!))
                         setOnCardClickListener {
                             stateModelClickedChannel.sendBlocking(it)
                             hideRecords()
@@ -107,6 +108,11 @@ class StateReplayView @JvmOverloads constructor(
         this.onClick = onClick
     }
 
+    fun addMocks(list: List<ScreenStateModel>) {
+        adapter.addMocks(list)
+    }
+
+
     private fun showRecords() {
         recordsView.isVisible = true && testButtonEnabled
     }
@@ -115,13 +121,13 @@ class StateReplayView @JvmOverloads constructor(
         recordsView.isVisible = false
     }
 
-    fun addMocks(list: List<ScreenStateModel>) {
-        adapter.addMocks(list)
-    }
 
     companion object {
         fun createInstance(context: Context) = StateReplayView(context).apply {
-            layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
+            layoutParams = FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT
+            )
         }
     }
 }

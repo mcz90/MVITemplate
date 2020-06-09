@@ -13,7 +13,13 @@ import kotlinx.serialization.parse
 class StateStorage(private val sharedPreferences: SharedPreferences) {
 
     fun add(model: ScreenStateModel) {
-        val key = "${model.name}\n${System.currentTimeMillis()}"
+        val key = "$${model.name}\n${System.currentTimeMillis()}"
+        val data = Json(JsonConfiguration.Stable).stringify(ScreenStateModel.serializer(), model)
+        sharedPreferences.edit().putString(key, data).apply()
+    }
+
+    fun addLast(model: ScreenStateModel) {
+        val key = "$LAST_STATE_MODEL_KEY${model.name}"
         val data = Json(JsonConfiguration.Stable).stringify(ScreenStateModel.serializer(), model)
         sharedPreferences.edit().putString(key, data).apply()
     }
@@ -25,7 +31,19 @@ class StateStorage(private val sharedPreferences: SharedPreferences) {
             .map { Json(JsonConfiguration.Stable).parse(it.value.toString()) as ScreenStateModel }
     }
 
+    fun getLast(stateClass: KClass<out ScreenState>): ScreenStateModel? {
+        return sharedPreferences.all.entries
+            .filter { it.key.contains(stateClass.simpleName.toString()) }
+            .takeIf { it.isNotEmpty() }
+            ?.map { Json(JsonConfiguration.Stable).parse(it.value.toString()) as ScreenStateModel }
+            ?.first()
+    }
+
     fun clear() {
         sharedPreferences.edit().clear().apply()
+    }
+
+    companion object {
+        private const val LAST_STATE_MODEL_KEY = "LAST_"
     }
 }

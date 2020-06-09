@@ -23,6 +23,8 @@ abstract class MviViewModel<State : ScreenState, Intent : ScreenIntent>(
     private val lifecycleOwner: LifecycleOwner
 ) : ViewModel(), CoroutineScope, KoinComponent {
 
+    private val stateRecorder: StateRecorder by inject()
+
     override val coroutineContext: CoroutineContext = Dispatchers.IO
 
     protected val state = MutableLiveData<State>()
@@ -41,6 +43,7 @@ abstract class MviViewModel<State : ScreenState, Intent : ScreenIntent>(
     private fun observe() {
         state.removeObservers(lifecycleOwner)
         state.observe(lifecycleOwner, Observer { state ->
+            stateRecorder.saveLast(state.serialize())
             renderBlock(state)
         })
     }

@@ -52,8 +52,19 @@ class StateRecorder(
             ?.add(data)
     }
 
+    fun saveLast(data: ScreenStateModel, rule: Boolean = true) {
+        stateStorage
+            .takeIf { getConfig().enabled && rule && getConfig().isInReplayMode }
+            ?.addLast(data)
+    }
+
+
     fun getLast(): ScreenStateModel? {
-        return getAll().takeIf { it.isNotEmpty() }?.first()
+        return currentStateClass?.let {
+            stateStorage
+                .takeIf { getConfig().enabled && getConfig().isInReplayMode }
+                ?.getLast(it)
+        }
     }
 
     fun getAll(): List<ScreenStateModel> {
@@ -82,7 +93,8 @@ class StateRecorder(
 
     fun updateCurrentState(fragmentClass: KClass<out MviFragment>) {
         val fragmentPrefix = fragmentClass.simpleName?.substringBefore("Fragment")
-        currentStateClass = states.first { it.simpleName?.substringBefore("State") == fragmentPrefix }
+        currentStateClass =
+            states.first { it.simpleName?.substringBefore("State") == fragmentPrefix }
     }
 
 
