@@ -68,7 +68,7 @@ abstract class MviFragment(@LayoutRes contentLayoutId: Int) : Fragment(contentLa
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Log.wtf("wtf", "onViewCreated")
+        Log.wtf("wtf", "onViewCreated ${this::class.simpleName}")
         lifecycle.addObserver(viewModel)
         lifecycle.addObserver(this.view)
         stateRecorder.getConfig()
@@ -80,12 +80,12 @@ abstract class MviFragment(@LayoutRes contentLayoutId: Int) : Fragment(contentLa
     }
 
     override fun onDestroyView() {
-        Log.wtf("wtf", "onDestroyView")
+        super.onDestroyView()
         components = null
         lifecycle.removeObserver(stateRecorder)
         lifecycle.removeObserver(viewModel)
         lifecycle.removeObserver(this.view)
-        super.onDestroyView()
+        Log.wtf("wtf", "onDestroyView ${this::class.simpleName}")
     }
 
     private fun Fragment.attachRecordButton() {
