@@ -1,6 +1,7 @@
 package com.czyzewski.mvi
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -67,6 +68,9 @@ abstract class MviFragment(@LayoutRes contentLayoutId: Int) : Fragment(contentLa
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        Log.wtf("wtf", "onViewCreated")
+        lifecycle.addObserver(viewModel)
+        lifecycle.addObserver(this.view)
         stateRecorder.getConfig()
             .takeIf { it.enabled }
             ?.let {
@@ -76,7 +80,11 @@ abstract class MviFragment(@LayoutRes contentLayoutId: Int) : Fragment(contentLa
     }
 
     override fun onDestroyView() {
+        Log.wtf("wtf", "onDestroyView")
         components = null
+        lifecycle.removeObserver(stateRecorder)
+        lifecycle.removeObserver(viewModel)
+        lifecycle.removeObserver(this.view)
         super.onDestroyView()
     }
 

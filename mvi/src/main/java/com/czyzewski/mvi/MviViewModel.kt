@@ -1,19 +1,12 @@
 package com.czyzewski.mvi
 
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
 import com.czyzewski.mvi.staterecorder.StateRecorder
-import kotlin.coroutines.CoroutineContext
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.ObsoleteCoroutinesApi
+import kotlinx.coroutines.*
 import kotlinx.serialization.ImplicitReflectionSerializer
 import org.koin.core.KoinComponent
 import org.koin.core.inject
+import kotlin.coroutines.CoroutineContext
 
 @FlowPreview
 @ObsoleteCoroutinesApi
@@ -21,7 +14,7 @@ import org.koin.core.inject
 @ExperimentalCoroutinesApi
 abstract class MviViewModel<State : ScreenState, Intent : ScreenIntent>(
     private val lifecycleOwner: LifecycleOwner
-) : ViewModel(), CoroutineScope, KoinComponent {
+) : ViewModel(), CoroutineScope, KoinComponent, LifecycleObserver {
 
     private val stateRecorder: StateRecorder by inject()
 
