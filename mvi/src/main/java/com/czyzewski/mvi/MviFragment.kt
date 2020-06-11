@@ -70,7 +70,6 @@ abstract class MviFragment(@LayoutRes contentLayoutId: Int) : Fragment(contentLa
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Log.wtf("wtf", "onViewCreated ${this::class.simpleName}")
-        this.view.attach(components)
         lifecycle.addObserver(viewModel)
         lifecycle.addObserver(this.view)
         stateRecorder.getConfig()
