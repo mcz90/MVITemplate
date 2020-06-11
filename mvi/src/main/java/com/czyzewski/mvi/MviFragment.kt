@@ -1,5 +1,6 @@
 package com.czyzewski.mvi
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -37,7 +38,7 @@ abstract class MviFragment(@LayoutRes contentLayoutId: Int) : Fragment(contentLa
         parametersOf(this@MviFragment::class)
     }
 
-    var components: ViewComponents? = null
+    abstract var components: ViewComponents?
 
     abstract val view: IMviView<out ScreenState, out ViewComponents>
 
@@ -66,9 +67,15 @@ abstract class MviFragment(@LayoutRes contentLayoutId: Int) : Fragment(contentLa
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        view.onConfigurationChanged(newConfig.orientation)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Log.wtf("wtf", "onViewCreated ${this::class.simpleName}")
+        this.view.attach(components)
         lifecycle.addObserver(viewModel)
         lifecycle.addObserver(this.view)
         stateRecorder.getConfig()
@@ -82,9 +89,10 @@ abstract class MviFragment(@LayoutRes contentLayoutId: Int) : Fragment(contentLa
     override fun onDestroyView() {
         super.onDestroyView()
         components = null
+        view.detach()
         lifecycle.removeObserver(stateRecorder)
         lifecycle.removeObserver(viewModel)
-        lifecycle.removeObserver(this.view)
+        lifecycle.removeObserver(view)
         Log.wtf("wtf", "onDestroyView ${this::class.simpleName}")
     }
 

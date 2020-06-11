@@ -8,4 +8,5 @@ interface IMviView<State : ScreenState, Components : ViewComponents> : Lifecycle
     fun <State> render(state: State)
     fun onConfigurationChanged(orientation: Int)
     fun <Components> attach(components: Components)
+    fun detach()
 }
