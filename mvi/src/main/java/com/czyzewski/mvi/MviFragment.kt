@@ -38,7 +38,7 @@ abstract class MviFragment(@LayoutRes contentLayoutId: Int) : Fragment(contentLa
         parametersOf(this@MviFragment::class)
     }
 
-    abstract var components: ViewComponents?
+    abstract val components: ViewComponents
 
     abstract val view: IMviView<out ScreenState, out ViewComponents>
 
@@ -88,7 +88,6 @@ abstract class MviFragment(@LayoutRes contentLayoutId: Int) : Fragment(contentLa
 
     override fun onDestroyView() {
         super.onDestroyView()
-        components = null
         view.detach()
         lifecycle.removeObserver(stateRecorder)
         lifecycle.removeObserver(viewModel)
