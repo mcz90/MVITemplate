@@ -14,14 +14,8 @@ import androidx.fragment.app.Fragment
 import com.czyzewski.mvi.staterecorder.StateRecorder
 import com.czyzewski.mvi.statereplayview.ScreenStateModel
 import com.czyzewski.mvi.statereplayview.StateReplayView
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.ObsoleteCoroutinesApi
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.consumeEach
-import kotlinx.coroutines.launch
 import kotlinx.serialization.ImplicitReflectionSerializer
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
@@ -32,13 +26,14 @@ import kotlin.reflect.full.createInstance
 @FlowPreview
 @ObsoleteCoroutinesApi
 @ImplicitReflectionSerializer
-abstract class MviFragment(@LayoutRes contentLayoutId: Int) : Fragment(contentLayoutId), CoroutineScope {
+abstract class MviFragment(@LayoutRes contentLayoutId: Int) : Fragment(contentLayoutId),
+    CoroutineScope {
 
     private val stateRecorder: StateRecorder by inject {
         parametersOf(this@MviFragment::class)
     }
 
-    abstract val components: ViewComponents
+    var components: ViewComponents? = null
 
     abstract val view: IMviView<out ScreenState, out ViewComponents>
 
@@ -88,6 +83,7 @@ abstract class MviFragment(@LayoutRes contentLayoutId: Int) : Fragment(contentLa
 
     override fun onDestroyView() {
         super.onDestroyView()
+        components = null
         view.detach()
         lifecycle.removeObserver(stateRecorder)
         lifecycle.removeObserver(viewModel)
@@ -97,8 +93,8 @@ abstract class MviFragment(@LayoutRes contentLayoutId: Int) : Fragment(contentLa
 
     private fun Fragment.attachRecordButton() {
         val stateReplayView = StateReplayView
-                .createInstance(this@MviFragment.requireContext())
-                .apply { addMocks(prepareMocks()) }
+            .createInstance(this@MviFragment.requireContext())
+            .apply { addMocks(prepareMocks()) }
         this.view?.rootView
             ?.findViewById<ViewGroup>(android.R.id.content)
             ?.apply {
@@ -113,7 +109,11 @@ abstract class MviFragment(@LayoutRes contentLayoutId: Int) : Fragment(contentLa
                 stateModelClicked()
                     .consumeEach { screenState ->
                         stateRecorder.currentStateClass
-                            ?.let { this@MviFragment.view.render(it.createInstance().deserialize(screenState.data)) }
+                            ?.let {
+                                this@MviFragment.view.render(
+                                    it.createInstance().deserialize(screenState.data)
+                                )
+                            }
                     }
             }
         }
