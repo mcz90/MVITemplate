@@ -7,6 +7,6 @@ import kotlinx.serialization.ImplicitReflectionSerializer
 interface IMviView<State : ScreenState, Components : ViewComponents> : LifecycleObserver {
     fun <State> render(state: State)
     fun onConfigurationChanged(orientation: Int)
-    fun <Components> attach(components: Components)
+    fun <Components> attach(components: Components?)
     fun detach()
 }
